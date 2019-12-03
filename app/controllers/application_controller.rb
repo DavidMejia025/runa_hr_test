@@ -6,8 +6,13 @@ class ApplicationController < ActionController::API
   before_action :authorize_request, except:  %i[login signup]
 
   def authorize_request
-    header = request.headers['Authorization']
-    header = header.split(' ').last if header
+    header = request&.headers&.dig('Authorization')
+
+    if header
+      header = header.split(' ').last
+    else
+      raise(ExceptionHandler::MissingToken)
+    end
 
     begin
       @decoded = JwtService.decode(token: header)
@@ -17,11 +22,9 @@ class ApplicationController < ActionController::API
   end
 
   def admin_only
-    return true if @current_user.admin?
 
-    raise(
-      ExceptionHandler::AuthenticationError,
-      ("#{not_an_admin}")
-    )
+    return true if @current_user&.admin?
+
+    raise ExceptionHandler::AuthenticationError, "#{not_an_admin}"
   end
 end

@@ -17,6 +17,8 @@
 class User < ApplicationRecord
   after_initialize :set_default_role, :if => :new_record?
 
+  validates :name, :last_name, :id_number, :department, :position, presence: true
+
   has_secure_password
 
   enum role: %i[employee admin]

@@ -7,10 +7,12 @@ class JwtService
     JWT.encode(payload, HMAC_SECRET)
   end
 
-  def self.decode(token: token)
-    body = JWT.decode(token, HMAC_SECRET)[0]
+  def self.decode(token:)
+    body = JWT.decode(token, HMAC_SECRET)&.first
 
-    HashWithIndifferentAccess.new body
+    return HashWithIndifferentAccess.new body if body.class == Hash
+
+    body
   rescue JWT::DecodeError => e
     raise ExceptionHandler::InvalidToken, e.message
   end

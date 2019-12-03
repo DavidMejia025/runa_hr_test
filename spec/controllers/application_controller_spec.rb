@@ -2,15 +2,22 @@ require 'rails_helper'
 
 RSpec.describe ApplicationController, type: :controller do
   describe "#authorize_request" do
-    subject { pdescribe_class.authorize_request }
+    let!(:payload) { {user_id: 1} }
+    let!(:secret)  { Rails.application.secrets.secret_key_base}
+    let!(:token)   { JWT.encode(payload, secret) }
+
+    subject { described_class.new.authorize_request }
+
+    #before { request.headers["Authorization"] = "1234" }
 
     context "when request is authorized" do
       context "when header request contains valid authorization token" do
-        it "calls Jwt service" do
-
+        xit "calls Jwt service" do
+          expect(JwtService).to receive(:decode)
+          subject
         end
 
-        it "returns a valid user" do
+        xit "returns a valid user" do
 
         end
       end
@@ -18,23 +25,25 @@ RSpec.describe ApplicationController, type: :controller do
 
     context "when request can not be authorized" do
       context "when header request does not contains authorization token" do
-        it "do not call Jwt service" do
-
+        xit "do not call Jwt service" do
+          expect(JwtService).not_to receive(:decode)
+          subject
         end
 
         it "raise error" do
-
+          expect { subject  }.to raise_error ExceptionHandler::MissingToken
         end
       end
 
       context "when header request contains an invalid authorization token" do
-        it "calls Jwt service" do
+        xit "calls Jwt service" do
 
         end
 
-        it "raise error" do
-
+        xit "raise error" do
+          expect { subject }.to raise_error ExceptionHandler::InvalidToken
         end
       end
     end
+  end
 end

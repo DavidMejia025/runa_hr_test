@@ -3,27 +3,55 @@ class Api::V1::UsersController < ApplicationController
   before_action :find_user,  only:   %i[show update]
   before_action :admin_only, except: %i[show create]
 
-  def index
-    @users = User.all
+  def create
+    @user = User.new(user_params)
 
-    json_response(object: @users)
-  end
-
-  def show
-    json_response(object: @user)
-  end
-
-  def update
-    unless @user.update(user_params)
-      json_response(
-        object: {errors: @user.errors.full_messages },
-        status: :unprocessable_entity
-      )
+    if @user.save
+      head :ok
+    else
+      raise ActiveRecord::RecordInvalid, @user
     end
   end
 
+  def index
+    @users = User.all
+
+    users = @users.map do |user|
+      build_user_response(user: user)
+    end
+
+    json_response(object: users)
+  end
+
+  def show
+    @user = User.find(params[:id])
+
+    if @user
+      user = build_user_response(user: @user)
+
+      json_response(object: user)
+    else
+      raise ActiveRecord::RecordInvalid, "User with id + #{params[:id]} was not foud"
+    end
+  end
+
+  def update
+    @user = User.find(params[:id])
+
+    if @user.update!(user_params)
+      head :ok
+    else
+      raise ActiveRecord::RecordInvalid, @user
+    end
+  end
+
+
   def destroy
-    @user.destroy
+      @user = User.find(params[:id])
+
+      @user.destroy
+
+      head :ok
   end
 
   private

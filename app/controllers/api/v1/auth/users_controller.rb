@@ -1,19 +1,19 @@
-class Api::V1::Auth::UsersController< ApplicationController
+class Api::V1::Auth::UsersController < ApplicationController
   def login
-    @user = User.find_by(id_number: login_params[:id_number])
+    @user = User.find_by(id_number: auth_params[:id_number])
 
-    if @user&.authenticate(login_params[:password])
+    if @user&.authenticate(auth_params[:password])
       token = JwtService.encode(payload: {user_id: @user.id})
       time  = Time.now + 24.hours.to_i
 
       json_response(object: build_response(token: token, time: time))
     else
-      raise(ExceptionHandler::AuthenticationError, invalid_credentials)
+      raise(ExceptionHandler::AuthenticationError, "invalid_credentials")
     end
   end
 
   def signup
-    @user = User.new(login_params)
+    @user = User.new(auth_params)
 
     begin
       if @user.save
@@ -29,7 +29,7 @@ class Api::V1::Auth::UsersController< ApplicationController
 
   private
 
-  def login_params
+  def auth_params
     params.permit(
       :name,
       :last_name,
