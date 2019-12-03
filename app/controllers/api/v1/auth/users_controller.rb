@@ -3,7 +3,7 @@ class Api::V1::Auth::UsersController< ApplicationController
     @user = User.find_by(id_number: login_params[:id_number])
 
     if @user&.authenticate(login_params[:password])
-      token = JwtService.encode(user_id: @user.id)
+      token = JwtService.encode(payload: {user_id: @user.id})
       time  = Time.now + 24.hours.to_i
 
       json_response(object: build_response(token: token, time: time))
@@ -17,7 +17,7 @@ class Api::V1::Auth::UsersController< ApplicationController
 
     begin
       if @user.save
-        token = JwtService.encode(user_id: @user.id)
+        token = JwtService.encode(payload: {user_id: @user.id})
         time  = Time.now + 24.hours.to_i
 
         json_response(object: build_response(token: token, time: time), status: :created)
