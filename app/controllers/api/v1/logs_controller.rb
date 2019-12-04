@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationController
   before_action :authorize_request, except: :create
-  before_action :get_user     only %i[update report]
+  before_action :get_user,          only:   %i[update report]
   before_action :admin_only
 
   def arrival
@@ -65,6 +65,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def get_user
-    @user =|| User.find(params[:id])
+    @user ||= User.find(params[:id])
   end
 end
