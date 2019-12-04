@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::UsersController, type: :controller do
-  let!(:user)        { create :user, id: 1, role: :admin }
+  let!(:user)        { create :user, id: 1, role: :admin, password: "12345678" }
   let(:current_user) { user }
   let(:params) do
     {
@@ -129,6 +129,8 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
   describe "#create" do
     subject { get :create, params: params }
+
+    before { allow_any_instance_of(described_class).to receive(:admin_only).and_return(true) }
 
     context "when user can be created" do
       it "users counter increased by one" do
@@ -290,6 +292,74 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           expect_any_instance_of(described_class).to receive(:json_response).with(response)
           subject
         end
+      end
+    end
+  end
+
+  describe "#update_password" do
+    let(:params) do
+      {
+        password:                  password,
+        new_password:              "new_pasword123",
+        new_password_confirmation: "new_pasword123",
+      }
+    end
+
+    subject { put :update_password, params: params.merge({id: 1}) }
+
+    before { allow_any_instance_of(described_class).to receive(:admin_only).and_return(true) }
+
+    context "when user password is valid" do
+      let(:password) { user.password }
+
+      it "uodate password" do
+        expect {
+          subject
+        }.to change {
+          user.reload.password
+        }.to("new_pasword123")
+      end
+    end
+
+    context "when user passwor is invalid" do
+      let(:password) { "wrong_password" }
+      let!(:response) { {object: object, status: :not_found} }
+      let!(:object)   do
+        {
+          message: "invalid_credentials"
+        }
+      end
+
+      it "returns user in json response" do
+        expect(subject.body).to match(object.to_json)
+      end
+
+      it "returns status 401" do
+        expect(subject.status).to eq(401)
+      end
+    end
+
+    context "when user new_password doesnt match" do
+      let(:params) do
+        {
+          password:                  user.password,
+          new_password:              "new_pasword123",
+          new_password_confirmation: "new",
+        }
+      end
+      let!(:response) { {object: object, status: :not_found} }
+      let!(:object)   do
+        {
+          message: "new password confirmation failed"
+        }
+      end
+
+      it "returns user in json response" do
+        expect(subject.body).to match(object.to_json)
+      end
+
+      it "returns status 401" do
+        expect(subject.status).to eq(401)
       end
     end
   end

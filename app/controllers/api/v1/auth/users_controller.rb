@@ -11,22 +11,7 @@ class Api::V1::Auth::UsersController < ApplicationController
       raise(ExceptionHandler::AuthenticationError, "invalid_credentials")
     end
   end
-
-  def signup
-    @user = User.new(auth_params)
-
-    begin
-      if @user.save
-        token = JwtService.encode(payload: {user_id: @user.id})
-        time  = Time.now + 24.hours.to_i
-
-        json_response(object: build_response(token: token, time: time), status: :created)
-      else
-        raise(ActiveRecord::RecordInvalid, @user)
-      end
-    end
-  end
-
+  
   private
 
   def auth_params

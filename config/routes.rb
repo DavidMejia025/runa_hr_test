@@ -23,8 +23,9 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :users, only: %i[index show create update destroy]
 
+      put "update_password", to: "users#update_password"
+
       namespace :auth do
-        post "signup", to: "users#signup"
         post "login",  to: "users#login"
       end
     end
