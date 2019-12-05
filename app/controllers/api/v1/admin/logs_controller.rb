@@ -33,6 +33,12 @@ class Api::V1::Admin::LogsController < ApplicationController
   end
 
   def report
+    puts "reports"
+    user = User.find_by(id_number: params[:id_number])
+
+    p report = user.report(start_day: params[:start_day], end_day: params[:end_day])
+
+    json_response(object: report)
   end
 
   def create

@@ -4,7 +4,7 @@
 #                        root GET    /                                                                                        homepage#index
 #           api_v1_auth_login POST   /api/v1/auth/login(.:format)                                                             api/v1/auth/users#login
 # api_v1_user_update_password PUT    /api/v1/users/:user_id/update_password(.:format)                                         api/v1/users#update_password
-#     api_v1_user_logs_report GET    /api/v1/users/:user_id/logs/report(.:format)                                             api/v1/logs#report
+#          api_v1_user_report GET    /api/v1/users/:user_id/report(.:format)                                                  api/v1/users#report
 #                api_v1_users GET    /api/v1/users(.:format)                                                                  api/v1/users#index
 #                             POST   /api/v1/users(.:format)                                                                  api/v1/users#create
 #                 api_v1_user GET    /api/v1/users/:id(.:format)                                                              api/v1/users#show
@@ -12,8 +12,8 @@
 #                             PUT    /api/v1/users/:id(.:format)                                                              api/v1/users#update
 #                             DELETE /api/v1/users/:id(.:format)                                                              api/v1/users#destroy
 #           api_v1_admin_logs POST   /api/v1/admin/logs(.:format)                                                             api/v1/admin/logs#create
-#            api_v1_admin_log PATCH  /api/v1/admin/logs/:id(.:format)                                                         api/v1/admin/logs#update
-#                             PUT    /api/v1/admin/logs/:id(.:format)                                                         api/v1/admin/logs#update
+#            api_v1_admin_log DELETE /api/v1/admin/logs/:id(.:format)                                                         api/v1/admin/logs#destroy
+#    api_v1_admin_logs_report GET    /api/v1/admin/logs/report(.:format)                                                      api/v1/admin/logs#report
 #  api_v1_admin_logs_check_in POST   /api/v1/admin/logs/check_in(.:format)                                                    api/v1/admin/logs#check_in
 # api_v1_admin_logs_check_out POST   /api/v1/admin/logs/check_out(.:format)                                                   api/v1/admin/logs#check_out
 #          rails_service_blob GET    /rails/active_storage/blobs/:signed_id/*filename(.:format)                               active_storage/blobs#show
@@ -34,7 +34,7 @@ Rails.application.routes.draw do
       resources :users, only: %i[index show update create destroy] do
         put "update_password", to: "users#update_password"
 
-        get  'logs/report',    to: "logs#report"
+        get  'report',    to: "users#report"
       end
 
       namespace :admin do
