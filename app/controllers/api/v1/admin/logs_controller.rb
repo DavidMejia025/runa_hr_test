@@ -1,7 +1,7 @@
 class Api::V1::Admin::LogsController < ApplicationController
   before_action :authorize_request
   before_action :find_log,  only: %i[destroy]
-  before_action :get_user,  only: %i[check_in check_out create]
+  before_action :get_user,  only: %i[check_in check_out create report]
   before_action :admin_only?
 
   def check_in
@@ -19,7 +19,7 @@ class Api::V1::Admin::LogsController < ApplicationController
   def check_out
     user = get_user
 
-    @log = user .logs.last
+    @log = user.logs.last
 
     unless @log.check_out.nil?
       raise ExceptionHandler::InvalidLog, "User #{user.id_number} already left the office please contact your manager to fix logs"
@@ -33,10 +33,9 @@ class Api::V1::Admin::LogsController < ApplicationController
   end
 
   def report
-    puts "reports"
-    user = User.find_by(id_number: params[:id_number])
+    user = get_user
 
-    p report = user.report(start_day: params[:start_day], end_day: params[:end_day])
+    report = user.report(start_day: params[:start_day], end_day: params[:end_day])
 
     json_response(object: report)
   end
