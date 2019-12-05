@@ -18,6 +18,7 @@ class User < ApplicationRecord
   after_initialize :set_default_role, :if => :new_record?
 
   validates :name, :last_name, :id_number, :department, :position, presence: true
+  validates :id_number, uniqueness: true
 
   has_many :logs
 
@@ -26,6 +27,8 @@ class User < ApplicationRecord
   enum role: %i[employee admin]
 
   def set_default_role
-    self.role ||= :employee
+    role = self.role ||= :employee
+
+    self.role = role
   end
 end

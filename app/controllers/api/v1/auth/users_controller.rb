@@ -1,4 +1,6 @@
 class Api::V1::Auth::UsersController < ApplicationController
+  skip_before_action :authorize_request
+
   def login
     @user = User.find_by(id_number: auth_params[:id_number])
 
@@ -11,7 +13,7 @@ class Api::V1::Auth::UsersController < ApplicationController
       raise(ExceptionHandler::AuthenticationError, "invalid_credentials")
     end
   end
-  
+
   private
 
   def auth_params

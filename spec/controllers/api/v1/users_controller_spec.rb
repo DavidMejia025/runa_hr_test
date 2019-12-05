@@ -7,7 +7,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     {
       name:       user.name,
       last_name:  user.last_name,
-      id_number:  user.id_number,
+      id_number:  123456,
       password:   user.password,
       role:       :admin,
       department: "Tech",
@@ -57,7 +57,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
     subject { get :index }
 
-    before { allow_any_instance_of(described_class).to receive(:admin_only).and_return(true) }
+    before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(true) }
 
     context "fetch Users data" do
       it "returns user in json response" do
@@ -81,7 +81,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     subject { delete :destroy, params: params }
 
     context "when curren_user is admin user" do
-      before { allow_any_instance_of(described_class).to receive(:admin_only).and_return(true) }
+      before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(true) }
 
       context "when User exist" do
         it "deletes the user" do
@@ -130,7 +130,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
   describe "#create" do
     subject { get :create, params: params }
 
-    before { allow_any_instance_of(described_class).to receive(:admin_only).and_return(true) }
+    before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(true) }
 
     context "when user can be created" do
       it "users counter increased by one" do
@@ -227,10 +227,10 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       }
     end
 
-    subject { get :update, params: params.merge(id) }
+    subject { put :update, params: params.merge(id) }
 
     context "when user is admin" do
-      before { allow_any_instance_of(described_class).to receive(:admin_only).and_return(true) }
+      before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(true) }
 
       context "when user can be updated" do
         it "name change" do
@@ -302,12 +302,13 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         password:                  password,
         new_password:              "new_pasword123",
         new_password_confirmation: "new_pasword123",
+        id_number:                 user.id_number
       }
     end
 
-    subject { put :update_password, params: params.merge({id: 1}) }
+    subject { put :update_password, params: params.merge({user_id: 1}) }
 
-    before { allow_any_instance_of(described_class).to receive(:admin_only).and_return(true) }
+    before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(true) }
 
     context "when user password is valid" do
       let(:password) { user.password }
@@ -350,7 +351,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       let!(:response) { {object: object, status: :not_found} }
       let!(:object)   do
         {
-          message: "new password confirmation failed"
+          message: "invalid_credentials"
         }
       end
 
