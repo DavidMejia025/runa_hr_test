@@ -1,27 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   before_action :authorize_request
-  before_action :find_user,   only:   %i[show update destroy]
-  before_action :admin_only?, except: %i[show update_password]
-
-  def create
-    @user = User.new(user_params)
-
-    if @user.save
-      head :ok
-    else
-      raise ActiveRecord::RecordInvalid, @user
-    end
-  end
-
-  def index
-    @users = User.all
-
-    users = @users.map do |user|
-      build_user_response(user: user)
-    end
-
-    json_response(object: users)
-  end
+  before_action :find_user
+  before_action :user_eq_current_user?
 
   def show
     if @user
@@ -33,18 +13,8 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  def update
-    if @user.update!(user_params)
-      head :ok
-    else
-      raise ActiveRecord::RecordInvalid, @user
-    end
-  end
-
   def update_password
-    user = User.find_by(id_number: user_params[:id_number])
-
-    unless user&.authenticate(user_params[:password])
+    unless @current_user&.authenticate(user_params[:password])
       raise(ExceptionHandler::AuthenticationError, "invalid_credentials")
     end
 
@@ -52,34 +22,41 @@ class Api::V1::UsersController < ApplicationController
       raise(ExceptionHandler::AuthenticationError, "new password confirmation failed")
     end
 
-    if user.update!(password: user_params[:new_password])
+    if @current_user.update!(password: user_params[:new_password])
       head :ok
     else
       raise ActiveRecord::RecordInvalid, user
     end
   end
 
-  def destroy
-    @user.destroy
+  def report
+    report = @current_user.report(start_day: params[:start_day], end_day: params[:end_day])
 
-    head :ok
+    json_response(object: report)
   end
 
   private
 
   def find_user
-    @user ||= User.find(params[:id])
+    @user ||= User.find_by(id_number: params[:id_number])
+
+    if @user.nil?
+      raise ActiveRecord::RecordNotFound, "Couldn't find User with id_number=#{params[:id_number]}"
+    end
+  end
+
+  def user_eq_current_user?
+    unless @current_user == @user
+      raise ExceptionHandler::InvalidToken, "token does not corresponds to the user requested information"
+    end
+
+    true
   end
 
   def user_params
     params.permit(
-      :name,
-      :last_name,
       :id_number,
       :password,
-      :department,
-      :position,
-      :role,
       :new_password,
       :new_password_confirmation
     )

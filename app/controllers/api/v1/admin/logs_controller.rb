@@ -76,7 +76,7 @@ class Api::V1::Admin::LogsController < ApplicationController
     user = User.find_by(id_number: log_params[:id_number])
 
     if user.nil?
-      raise ActiveRecord::RecordNotFound, "User with id_number=#{log_params[:id_number]} does not exist"
+      raise ActiveRecord::RecordNotFound, "Couldn't find User with 'id_number'=#{params[:id_number]}"
     end
 
     user
