@@ -1,13 +1,10 @@
 class JwtService
-  HMAC_SECRET = Rails.application.secrets.secret_key_base
+  HMAC_SECRET = "CAB577FAF0FEC295C212B4F93C823129F5A6CCA774B4182BD34A4C9FB71789C3"
 
   def self.encode(payload:, exp: 24.hours.from_now)
     payload[:exp] = exp.to_i
-puts ".........................................."
-puts payload
-puts HMAC_SECRET
-puts ".........................................."
-    JWT.encode(payload, "string")
+
+    JWT.encode(payload, HMAC_SECRET)
   end
 
   def self.decode(token:)
