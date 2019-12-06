@@ -18,13 +18,6 @@ export default () => (
           >
             login
           </Link>
-          <Link
-            to="/auth/signup"
-            className="btn btn-sm"
-            role="button"
-          >
-            signup
-          </Link>
         </p>
       </div>
     </div>

@@ -5,13 +5,15 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
   let(:current_user) { user }
   let(:params) do
     {
-      name:       user.name,
-      last_name:  user.last_name,
-      id_number:  00112233,
-      password:   user.password,
-      role:       :admin,
-      department: "Tech",
-      position:   "Software Engineer"
+      user: {
+        name:       user.name,
+        last_name:  user.last_name,
+        id_number:  00112233,
+        password:   user.password,
+        role:       :admin,
+        department: "Tech",
+        position:   "Software Engineer"
+      }
     }
   end
 
@@ -146,7 +148,7 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
     end
 
     context "when user can not be created" do
-      let(:params)    { {name: "David"} }
+      let(:params)    { {user: {name: "David"}} }
       let!(:response) { {object: object, status: :unprocessable_entity} }
       let!(:object)   do
         {
@@ -220,11 +222,13 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
     let(:id_number) { {id_number: 123456} }
     let(:params) do
       {
-        name:           "Andres",
-        last_name:      "Bonilla",
-        new_id_number:  99999,
-        department:     1,
-        position:       "Product designer"
+        user: {
+          name:       "Andres",
+          last_name:  "Bonilla",
+          id_number:  99999,
+          department: 1,
+          position:   "Product designer"
+        }
       }
     end
 

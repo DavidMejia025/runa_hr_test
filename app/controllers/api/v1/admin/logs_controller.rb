@@ -1,6 +1,6 @@
 class Api::V1::Admin::LogsController < ApplicationController
   before_action :authorize_request
-  before_action :find_log,  only: %i[destroy]
+  before_action :find_log,  only: %i[destroy update]
   before_action :get_user,  only: %i[check_in check_out create report]
   before_action :admin_only?
 
@@ -35,7 +35,7 @@ class Api::V1::Admin::LogsController < ApplicationController
   def report
     user = get_user
 
-    report = user.report(start_day: params[:start_day], end_day: params[:end_day])
+    report = user.report(start_day: log_params[:start_day], end_day: log_params[:end_day])
 
     json_response(object: report)
   end
@@ -56,6 +56,14 @@ class Api::V1::Admin::LogsController < ApplicationController
     end
   end
 
+  def update
+    if @log.update!(log_info)
+      head :ok
+    else
+      raise ActiveRecord::RecordInvalid, @log
+    end
+  end
+
   def destroy
     @log.destroy
 
@@ -65,7 +73,20 @@ class Api::V1::Admin::LogsController < ApplicationController
   private
 
   def log_params
-    params.permit(:check_in, :check_out, :id_number)
+    params.permit(
+      :check_in,
+      :check_out,
+      :id_number,
+      :start_day,
+      :end_day
+    )
+  end
+
+  def log_info
+    log_info = log_params
+    log_info.delete("id_number")
+
+    log_info
   end
 
   def find_log

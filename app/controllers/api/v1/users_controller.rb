@@ -46,9 +46,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def user_eq_current_user?
-    puts ".................................."
-    puts @current_user
-    puts "current user"
     unless @current_user == @user
       raise ExceptionHandler::InvalidToken, "token does not corresponds to the user requested information"
     end

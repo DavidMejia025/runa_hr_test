@@ -34,9 +34,7 @@ class Api::V1::Admin::UsersController < ApplicationController
   end
 
   def update
-    update_user_params = update_params
-
-    if @user.update!(update_user_params)
+    if @user.update!(user_params)
       head :ok
     else
       raise ActiveRecord::RecordInvalid, @user
@@ -59,21 +57,10 @@ class Api::V1::Admin::UsersController < ApplicationController
     end
   end
 
-  def update_params
-    return user_params unless user_params[:new_id_number]
-
-     new_user_params = user_params.except(:new_id_number)
-
-     new_user_params[:id_number] = user_params[:new_id_number]
-
-     new_user_params
-  end
-
   def user_params
-   params.permit(
+   params.require(:user).permit(
      :name,
      :last_name,
-     :new_id_number,
      :id_number,
      :password,
      :department,
