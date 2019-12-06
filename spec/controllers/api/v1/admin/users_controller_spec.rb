@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::Admin::UsersController, type: :controller do
-  let!(:user)        { create :user, id: 1, id_number: 123456, role: :admin, password: "12345678" }
+  let!(:user)        { create :user,  id_number: 123456, role: :admin, password: "12345678" }
   let(:current_user) { user }
   let(:params) do
     {
       name:       user.name,
       last_name:  user.last_name,
-      id_number:  123456,
+      id_number:  00112233,
       password:   user.password,
       role:       :admin,
       department: "Tech",
@@ -20,8 +20,8 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
   end
 
   describe "#index" do
-    let!(:user_2)         { create :user, id: 2 }
-    let!(:user_3)         { create :user, id: 3 }
+    let!(:user_2)         { create :user, id: 2, id_number: 123457 }
+    let!(:user_3)         { create :user, id: 3, id_number: 123458 }
     let!(:users_response) { {object: object} }
     let!(:object) do
       [
@@ -220,11 +220,11 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
     let(:id_number) { {id_number: 123456} }
     let(:params) do
       {
-        name:       "Andres",
-        last_name:  "Bonilla",
-        id_number:  99999,
-        department: 1,
-        position:   "Product designer"
+        name:           "Andres",
+        last_name:      "Bonilla",
+        new_id_number:  99999,
+        department:     1,
+        position:       "Product designer"
       }
     end
 

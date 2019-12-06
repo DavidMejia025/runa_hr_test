@@ -31,7 +31,7 @@ RSpec.describe ApplicationController, type: :controller do
         end
 
         it "raise error" do
-          expect { subject  }.to raise_error ExceptionHandler::MissingToken
+          expect { subject }.to raise_error ExceptionHandler::MissingToken
         end
       end
 

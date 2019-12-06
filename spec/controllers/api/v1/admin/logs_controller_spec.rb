@@ -292,7 +292,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
         let!(:response)     { {object: object, status: :not_found} }
         let!(:object)   do
           {
-            message: "User with id_number=100 does not exist"
+            message: "Couldn't find User with 'id_number'=100"
           }
         end
 
@@ -314,6 +314,9 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
     end
 
     context "when current_user is not an admin_user" do
+      let(:employee_id)   { employee.id_number }
+      let!(:start_day)   { "20190101T083748-0500" }
+      let!(:end_day)     { "20190201T083748-0500" }
       let!(:current_user) { create :user, id: 4, id_number: 012345, role: :employee }
       let!(:response)     { {object: object, status: :unauthorized} }
       let!(:object)   do

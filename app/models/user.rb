@@ -33,19 +33,13 @@ class User < ApplicationRecord
   end
 
   def report(start_day:, end_day:)
-    puts" user report"
-    p start_day = Time.parse(start_day)
-    p emd_day   = Time.parse(end_day)
-
     logs = get_logs(start_day: start_day, end_day: end_day)
 
     build_report(logs: logs)
   end
 
   def get_logs(start_day:, end_day:)
-    puts "get_logs"
-
-    p Log.all.where("user_id = ? and check_in >= ? and check_out <= ?", self.id, start_day, end_day)
+    Log.all.where("user_id = ? and check_in >= ? and check_out <= ?", self.id, start_day, end_day)
   end
 
   def build_report(logs:)
