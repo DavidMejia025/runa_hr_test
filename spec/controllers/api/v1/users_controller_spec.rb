@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::UsersController, type: :controller do
   let!(:user)        { create :user, id: 1, id_number: 123456, role: :admin, password: "12345678" }
-  let(:current_user) { user }
   let(:params) do
     {
       name:       user.name,
@@ -16,6 +15,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
   end
 
   before do
+    controller.instance_variable_set(:@current_user, user)
     allow_any_instance_of(described_class).to receive(:authorize_request).and_return(user)
   end
 
@@ -57,17 +57,16 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
     context "when user can not be fetch user information" do
       context "when current user request user information from another user" do
-        let!(:user)          { create :user, id: 2, id_number: 000000}
-        let(:params)        { {id_number: 000000} }
-        let!(:current_user) { create :user, id: 4, id_number: 012345, role: :employee }
-        let!(:response)     { {object: object, status: :unprocessable_entity} }
-        let!(:object)   do
+        let(:params)        { {id_number: 123456} }
+        let(:current_user) { create :user, id_number: 123 }
+        let(:response)     { {object: object, status: :unprocessable_entity} }
+        let(:object)   do
           {
             message: "token does not corresponds to the user requested information"
           }
         end
 
-        before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(false) }
+        before { controller.instance_variable_set(:@current_user, current_user) }
 
         it "returns unauthorized response" do
           expect_any_instance_of(described_class).to receive(:json_response).with(response)
@@ -145,12 +144,13 @@ RSpec.describe Api::V1::UsersController, type: :controller do
             password:                  user.password,
             new_password:              "new_pasword123",
             new_password_confirmation: "new",
+            id_number:                 user.id_number
           }
         end
         let!(:response) { {object: object, status: :not_found} }
         let!(:object)   do
           {
-            message: "invalid_credentials"
+            message: "new password confirmation failed"
           }
         end
 
@@ -165,8 +165,8 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
       context "when current user request user information from another user" do
         let!(:user)         { create :user, id: 2, id_number: 000000}
+        let(:current_user) { create :user, id_number: 123 }
         let(:params)        { {id_number: 000000} }
-        let!(:current_user) { create :user, id: 4, id_number: 012345, role: :employee }
         let!(:response)     { {object: object, status: :unprocessable_entity} }
         let!(:object)   do
           {
@@ -174,7 +174,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           }
         end
 
-        before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(false) }
+        before { controller.instance_variable_set(:@current_user, current_user) }
 
         it "returns unauthorized response" do
           expect_any_instance_of(described_class).to receive(:json_response).with(response)
@@ -185,10 +185,9 @@ RSpec.describe Api::V1::UsersController, type: :controller do
   end
 
   describe "#report" do
-    let(:employee)       { create :user, id: 3,  role: :employee }
-    let!(:log_1)         { create :log,  :complete, id: 3, user_id: employee.id }
-    let!(:log_2)         { create :log,  :complete, id: 4, user_id: employee.id }
-    let!(:log_3)         { create :log,  :complete, id: 5, user_id: employee.id }
+    let!(:log_1)         { create :log,  :complete, id: 3, user_id: user.id }
+    let!(:log_2)         { create :log,  :complete, id: 4, user_id: user.id }
+    let!(:log_3)         { create :log,  :complete, id: 5, user_id: user.id }
     let(:params) do
       {
         id_number: employee_id,
@@ -201,14 +200,14 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
     context "when user is current user" do
       context "when employee exist" do
-        let(:employee_id)  { employee.id_number }
+        let(:employee_id)  { user.id_number }
 
         context "when there are records inside start_day and end_day range" do
           let!(:start_day)   { "20190101T083748-0500" }
           let!(:end_day)     { "20200101T083748-0500" }
           let(:report) do
             {
-              employee_id: 3,
+              employee_id: 1,
               total_logs: 3,
               logs: [
                   {
@@ -237,7 +236,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           let!(:end_day)     { "20190201T083748-0500" }
           let(:report) do
             {
-                employee_id: 3,
+                employee_id: 1,
                 total_logs:  0,
                 logs:        []
             }.to_json
@@ -256,7 +255,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         let!(:response)     { {object: object, status: :not_found} }
         let!(:object)   do
           {
-            message: "User with id_number=100 does not exist"
+            message: "Couldn't find User with id_number=100"
           }
         end
 
@@ -278,17 +277,17 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     end
 
     context "when current user request user information from another user" do
-      let!(:user)          { create :user, id: 2, id_number: 000000}
+      let!(:user)         { create :user, id: 2, id_number: 000000}
       let(:params)        { {id_number: 000000} }
-      let!(:current_user) { create :user, id: 4, id_number: 012345, role: :employee }
       let!(:response)     { {object: object, status: :unprocessable_entity} }
       let!(:object)   do
         {
           message: "token does not corresponds to the user requested information"
         }
       end
+      let(:current_user) { create :user, id_number: 123 }
 
-      before { allow_any_instance_of(described_class).to receive(:admin_only?).and_return(false) }
+      before { controller.instance_variable_set(:@current_user, current_user) }
 
       it "returns unauthorized response" do
         expect_any_instance_of(described_class).to receive(:json_response).with(response)

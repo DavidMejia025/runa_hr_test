@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::Admin::UsersController, type: :controller do
   let!(:user)        { create :user,  id_number: 123456, role: :admin, password: "12345678" }
-  let(:current_user) { user }
+  let!(:admin_user)  { create :user, id: 1234 }
   let(:params) do
     {
       user: {

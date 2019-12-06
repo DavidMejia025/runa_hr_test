@@ -43,6 +43,7 @@ class User < ApplicationRecord
   end
 
   def build_report(logs:)
+
     {
       employee_id: self.id,
       total_logs:  logs.count,
