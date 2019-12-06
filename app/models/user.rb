@@ -24,7 +24,8 @@ class User < ApplicationRecord
 
   has_secure_password
 
-  enum role: %i[employee admin]
+  enum role:       %i[employee admin]
+  enum department: %i[Tech Product Sales Operations Accout_Management]
 
   def set_default_role
     role = self.role ||= :employee
@@ -45,7 +46,7 @@ class User < ApplicationRecord
   def build_report(logs:)
 
     {
-      employee_id: self.id,
+      employee_id: self.id_number,
       total_logs:  logs.count,
       logs:        log_summary(logs: logs)
     }

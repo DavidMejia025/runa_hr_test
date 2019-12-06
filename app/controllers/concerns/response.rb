@@ -5,17 +5,15 @@ module Response
 
   def build_user_response(user:)
     user_response = {
-      user: {
-        name:       user.name,
-        last_name:  user.last_name,
-        id_number:  user.id_number,
-        department: user.department,
-        position:   user.position
-      }
+      name:       user.name,
+      last_name:  user.last_name,
+      id_number:  user.id_number,
+      department: user.department,
+      position:   user.position
     }
 
     if user.admin?
-      user_response[:user].merge!({ role: user.role})
+      user_response.merge!({ role: user.role})
     end
 
     user_response

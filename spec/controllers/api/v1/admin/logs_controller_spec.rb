@@ -244,7 +244,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
           let!(:end_day)     { "20200101T083748-0500" }
           let(:report) do
             {
-              employee_id: 3,
+              employee_id: employee_id,
               total_logs: 3,
               logs: [
                   {
@@ -273,7 +273,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
           let!(:end_day)     { "20190201T083748-0500" }
           let(:report) do
             {
-                employee_id: 3,
+                employee_id: employee_id,
                 total_logs:  0,
                 logs:        []
             }.to_json

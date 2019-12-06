@@ -1,7 +1,7 @@
 class Api::V1::Admin::LogsController < ApplicationController
   before_action :authorize_request
-  before_action :find_log,  only: %i[destroy update]
-  before_action :get_user,  only: %i[check_in check_out create report]
+  before_action :find_log,   only: %i[destroy update]
+  before_action :get_user,   only: %i[check_in check_out create report]
   before_action :admin_only?
 
   def check_in

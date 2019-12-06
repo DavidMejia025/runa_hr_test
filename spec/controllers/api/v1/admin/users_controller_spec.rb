@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::Admin::UsersController, type: :controller do
-  let!(:user)        { create :user,  id_number: 123456, role: :admin, password: "12345678" }
+  let!(:user)        { create :user, id_number: 123456, role: :admin, password: "12345678" }
   let!(:admin_user)  { create :user, id: 1234 }
   let(:params) do
     {
@@ -27,33 +27,27 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
     let!(:users_response) { {object: object} }
     let!(:object) do
       [
-          {
-            user: {
-              department:  0,
-              id_number:  user.id_number,
-              last_name:  user.last_name,
-              name:       user.name,
-              position:  "Software Engineer"
-            }
-          },
-          {
-            user: {
-              department:  0,
-              id_number:  user_2.id_number,
-              last_name:  user_2.last_name,
-              name:       user_2.name,
-              position:  "Software Engineer"
-            }
-          },
-          {
-            user: {
-              department:  0,
-              id_number:  user_3.id_number,
-              last_name:  user_3.last_name,
-              name:       user_3.name,
-              position:  "Software Engineer"
-            }
-          }
+        {
+          department:  0,
+          id_number:  user.id_number,
+          last_name:  user.last_name,
+          name:       user.name,
+          position:  "Software Engineer"
+        },
+        {
+          department:  0,
+          id_number:  user_2.id_number,
+          last_name:  user_2.last_name,
+          name:       user_2.name,
+          position:  "Software Engineer"
+        },
+        {
+          department:  0,
+          id_number:  user_3.id_number,
+          last_name:  user_3.last_name,
+          name:       user_3.name,
+          position:  "Software Engineer"
+        }
       ]
     end
 
@@ -173,18 +167,16 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
     subject { get :show, params: params }
 
     context "when user can be fetched" do
-      let(:params) { {id_number: 123456} }
+      let(:params)         { {id_number: 123456} }
       let!(:user_response) { {object: object} }
       let!(:object)   do
         {
-          user: {
-            name:       user.name,
-            last_name:  user.last_name,
-            id_number:  user.id_number,
-            department: user.department,
-            position:   user.position,
-            role:       user.role
-          }
+          name:       user.name,
+          last_name:  user.last_name,
+          id_number:  user.id_number,
+          department: user.department,
+          position:   user.position,
+          role:       user.role
         }
       end
 
@@ -226,7 +218,7 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
           name:       "Andres",
           last_name:  "Bonilla",
           id_number:  99999,
-          department: 1,
+          department: :Product,
           position:   "Product designer"
         }
       }
@@ -269,7 +261,7 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
             subject
           }.to change {
             user.reload.department
-          }.to(1)
+          }.to("Product")
         end
 
         it "postition change" do
