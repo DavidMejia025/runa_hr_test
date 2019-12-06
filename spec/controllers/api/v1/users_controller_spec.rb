@@ -55,7 +55,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
     context "when user can not be fetch user information" do
       context "when current user request user information from another user" do
-        let(:params)        { {id_number: 123456} }
+        let(:params)       { {id_number: 123456} }
         let(:current_user) { create :user, id_number: 123 }
         let(:response)     { {object: object, status: :unprocessable_entity} }
         let(:object)   do

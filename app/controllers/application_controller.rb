@@ -5,7 +5,6 @@ class ApplicationController < ActionController::API
 
   before_action :authorize_request, except:  %i[login signup]
 
-
   def authorize_request
     header = request.headers['Authorization']
 
@@ -18,7 +17,7 @@ class ApplicationController < ActionController::API
     begin
       @decoded = JwtService.decode(token: header)
 
-      @current_user = User.find(@decoded["user_id"])
+      @current_user = User.find_by(id_number: @decoded["user_id_number"])
     end
   end
 

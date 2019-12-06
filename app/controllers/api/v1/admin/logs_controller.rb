@@ -1,13 +1,11 @@
 class Api::V1::Admin::LogsController < ApplicationController
   before_action :authorize_request
-  before_action :find_log,   only: %i[destroy update]
-  before_action :get_user,   only: %i[check_in check_out create report]
+  before_action :find_log,   only:   %i[destroy update]
+  before_action :get_user,   except: %i[destroy update]
   before_action :admin_only?
 
   def check_in
-    user = get_user
-
-    @log = Log.new(check_in: log_params[:check_in], user_id: user.id)
+    @log = Log.new(check_in: log_params[:check_in], user_id: @user.id)
 
     if @log.save
       head :ok
@@ -17,12 +15,10 @@ class Api::V1::Admin::LogsController < ApplicationController
   end
 
   def check_out
-    user = get_user
-
-    @log = user.logs.last
+    @log = @user.logs.last
 
     unless @log.check_out.nil?
-      raise ExceptionHandler::InvalidLog, "User #{user.id_number} already left the office please contact your manager to fix logs"
+      raise ExceptionHandler::InvalidLog, "User #{@user.id_number} already left the office please contact your manager to fix logs"
     end
 
     if @log.update!(check_out: log_params[:check_out])
@@ -33,20 +29,16 @@ class Api::V1::Admin::LogsController < ApplicationController
   end
 
   def report
-    user = get_user
-
-    report = user.report(start_day: log_params[:start_day], end_day: log_params[:end_day])
+    report = @user.report(start_day: log_params[:start_day], end_day: log_params[:end_day])
 
     json_response(object: report)
   end
 
   def create
-    user = get_user
-
     @log = Log.new(
       check_in:  params[:check_in],
       check_out: params[:check_out],
-      user_id:   user.id
+      user_id:   @user.id
     )
 
     if @log.save
@@ -94,12 +86,10 @@ class Api::V1::Admin::LogsController < ApplicationController
   end
 
   def get_user
-    user = User.find_by(id_number: log_params[:id_number])
+    @user = User.find_by(id_number: log_params[:id_number])
 
-    if user.nil?
+    if @user.nil?
       raise ActiveRecord::RecordNotFound, "Couldn't find User with 'id_number'=#{params[:id_number]}"
     end
-
-    user
   end
 end

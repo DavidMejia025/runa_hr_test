@@ -3,8 +3,11 @@ class JwtService
 
   def self.encode(payload:, exp: 24.hours.from_now)
     payload[:exp] = exp.to_i
-
-    JWT.encode(payload, HMAC_SECRET)
+puts ".........................................."
+puts payload
+puts HMAC_SECRET
+puts ".........................................."
+    JWT.encode(payload, "string")
   end
 
   def self.decode(token:)

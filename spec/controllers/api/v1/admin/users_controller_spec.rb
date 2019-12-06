@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::Admin::UsersController, type: :controller do
-  let!(:user)        { create :user, id_number: 123456, role: :admin, password: "12345678" }
-  let!(:admin_user)  { create :user, id: 1234 }
+  let!(:user)            { create :user, id_number: 123456, role: :admin,    password: "12345678" }
+  let!(:not_admin_user)  { create :user, id_number: 100002, role: :employee, password: "12345678" }
   let(:params) do
     {
       user: {
         name:       user.name,
         last_name:  user.last_name,
-        id_number:  00112233,
+        id_number:  100001,
         password:   user.password,
         role:       :admin,
         department: "Tech",
@@ -18,6 +18,7 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
   end
 
   before do
+    controller.instance_variable_set(:@current_user, user)
     allow_any_instance_of(described_class).to receive(:authorize_request).and_return(user)
   end
 
@@ -93,7 +94,7 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
       end
 
       context "when user does not exist" do
-        let(:params) { {id_number: 10} }
+        let(:params)    { {id_number: 10} }
         let!(:response) { {object: object, status: :not_found} }
         let!(:object)   do
           {
@@ -109,6 +110,7 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
     end
 
     context "when current_user is not an admin_user" do
+      let(:params)    { {id_number: 100002} }
       let!(:response) { {object: object, status: :unauthorized} }
       let!(:object)   do
         {
@@ -116,9 +118,11 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
         }
       end
 
+      before { controller.instance_variable_set(:@current_user, not_admin_user) }
+
       it "returns unauthorized response" do
-        expect_any_instance_of(described_class).to receive(:json_response).with(response)
-        subject
+        expect_any_instance_of(described_class).to receive(:json_response)
+          subject
       end
     end
   end
@@ -181,8 +185,8 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
       end
 
       it "returns user in json response" do
-       expect_any_instance_of(described_class).to receive(:json_response).with(user_response).and_call_original
-       subject
+        expect_any_instance_of(described_class).to receive(:json_response).with(user_response).and_call_original
+        subject
       end
 
       it "returns user in json response" do
@@ -280,7 +284,7 @@ RSpec.describe Api::V1::Admin::UsersController, type: :controller do
 
       context "when user cannot be updated" do
         let!(:id_number) { 2 }
-        let!(:response) { {object: object, status: :not_found} }
+        let!(:response)  { {object: object, status: :not_found} }
         let!(:object)   do
           {
             message: "Couldn't find User with id_number=2"

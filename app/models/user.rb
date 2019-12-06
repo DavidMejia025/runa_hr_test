@@ -44,7 +44,6 @@ class User < ApplicationRecord
   end
 
   def build_report(logs:)
-
     {
       employee_id: self.id_number,
       total_logs:  logs.count,

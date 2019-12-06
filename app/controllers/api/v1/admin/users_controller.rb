@@ -1,7 +1,7 @@
 class Api::V1::Admin::UsersController < ApplicationController
   before_action :authorize_request
-  before_action :find_user,   only:   %i[show update destroy]
-  before_action :admin_only?, except: %i[show update_password]
+  before_action :find_user,  except: %i[create index]
+  before_action :admin_only?
 
   def create
     @user = User.new(user_params)

@@ -20,7 +20,7 @@ FactoryBot.define do
   factory :user do
     name       { Faker::Name.first_name  }
     last_name  { Faker::Name.last_name  }
-    id_number  { rand(100)}
+    id_number  { rand(100) }
     password   { "123456789" }
     department { 0 }
     position   { "Software Engineer" }

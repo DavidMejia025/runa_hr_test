@@ -65,8 +65,8 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
 
     context "when current_user is not an admin_user" do
       let!(:current_user) { create :user, id:2, id_number: 012345, role: :employee }
-      let!(:response)    { {object: object, status: :unauthorized} }
-      let!(:object)   do
+      let!(:response)     { {object: object, status: :unauthorized} }
+      let!(:object) do
         {
           message: "User is not admin"
         }
@@ -101,7 +101,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
       end
 
       context "when user does not exist" do
-        let(:params) { {id: 10} }
+        let(:params)    { {id: 10} }
         let!(:response) { {object: object, status: :not_found} }
         let!(:object)   do
           {
@@ -165,7 +165,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
   end
 
   describe "#check_out" do
-    let(:id) { {id: 1} }
+    let(:id)     { {id: 1} }
     let(:params) do
       {
         id_number: user.id_number,
@@ -289,7 +289,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
         let(:employee_id)  { 100 }
         let!(:start_day)   { "20190101T083748-0500" }
         let!(:end_day)     { "20190201T083748-0500" }
-        let!(:response)     { {object: object, status: :not_found} }
+        let!(:response)    { {object: object, status: :not_found} }
         let!(:object)   do
           {
             message: "Couldn't find User with 'id_number'=100"
@@ -315,11 +315,11 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
 
     context "when current_user is not an admin_user" do
       let(:employee_id)   { employee.id_number }
-      let!(:start_day)   { "20190101T083748-0500" }
-      let!(:end_day)     { "20190201T083748-0500" }
+      let!(:start_day)    { "20190101T083748-0500" }
+      let!(:end_day)      { "20190201T083748-0500" }
       let!(:current_user) { create :user, id: 4, id_number: 012345, role: :employee }
       let!(:response)     { {object: object, status: :unauthorized} }
-      let!(:object)   do
+      let!(:object) do
         {
           message: "User is not admin"
         }
@@ -333,7 +333,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
   end
 
   describe "#update" do
-    let(:id) { log.id }
+    let(:id)     { log.id }
     let(:params) do
       {
         id_number: user.id_number,
@@ -373,7 +373,7 @@ RSpec.describe Api::V1::Admin::LogsController, type: :controller do
       end
 
       context "when log cannot be updated" do
-        let!(:id) { 10 }
+        let!(:id)       { 10 }
         let!(:response) { {object: object, status: :not_found} }
         let!(:object)   do
           {
