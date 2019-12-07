@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe JwtService, type: :service do
-  let!(:secret)  { Rails.application.secrets.secret_key_base}
+  let!(:secret)  { "CAB577FAF0FEC295C212B4F93C823129F5A6CCA774B4182BD34A4C9FB71789C3" }
   let!(:payload) { {user_id: 1} }
 
   describe "#encode" do
